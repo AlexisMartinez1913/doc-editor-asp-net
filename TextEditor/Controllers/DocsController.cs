@@ -30,23 +30,7 @@ namespace TextEditor.Controllers
         }
 
         // GET: Docs/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var doc = await _context.Docs
-                .Include(d => d.User)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (doc == null)
-            {
-                return NotFound();
-            }
-
-            return View(doc);
-        }
+        
 
         // GET: Docs/Create
         public IActionResult Create()
@@ -84,11 +68,14 @@ namespace TextEditor.Controllers
             }
 
             var doc = await _context.Docs.FindAsync(id);
-            if (doc == null)
+            //el valor del claim "NameIdentifier",
+            //que por convención representa el ID del usuario autenticado actualmente.
+            //Se compara si el ID del usuario actual no coincide con el ID del usuario propietario del documento.
+            if (doc.UserId != User.FindFirstValue(ClaimTypes.NameIdentifier))
             {
                 return NotFound();
             }
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", doc.UserId);
+           
             return View(doc);
         }
 
@@ -140,6 +127,11 @@ namespace TextEditor.Controllers
                 .Include(d => d.User)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (doc == null)
+            {
+                return NotFound();
+            }
+
+            if (doc.UserId != User.FindFirstValue(ClaimTypes.NameIdentifier))
             {
                 return NotFound();
             }
