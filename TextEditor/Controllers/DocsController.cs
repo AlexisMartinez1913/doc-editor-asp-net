@@ -52,10 +52,7 @@ namespace TextEditor.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            if (doc.UserId != User.FindFirstValue(ClaimTypes.NameIdentifier))
-            {
-                return NotFound();
-            }
+           
             return View(doc);
         }
 
